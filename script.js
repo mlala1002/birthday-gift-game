@@ -14,6 +14,40 @@ let maxClickedItem = { name: "", count: 0 }; // 가장 많이 클릭된 상품 �
 const gameArea = document.getElementById("game-area");
 const scoreDisplay = document.getElementById("score");
 const timeDisplay = document.getElementById("time");
+const countdownDisplay = document.createElement("div");
+
+countdownDisplay.classList.add("countdown");
+gameArea.appendChild(countdownDisplay);
+
+function showItemList() {
+    const itemList = document.createElement("div");
+    itemList.classList.add("item-list");
+    items.forEach(item => {
+        const itemElement = document.createElement("div");
+        itemElement.classList.add("item");
+        itemElement.innerHTML = `<span>${item.icon}</span><br><span>${item.name}</span><br><span>${item.icon}</span>`;
+        itemList.appendChild(itemElement);
+    });
+    gameArea.appendChild(itemList);
+    return itemList;
+}
+
+function startCountdown(callback) {
+    let countdown = 5;
+    countdownDisplay.textContent = countdown;
+    const itemList = showItemList();
+
+    const countdownInterval = setInterval(() => {
+        countdown--;
+        countdownDisplay.textContent = countdown;
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            gameArea.removeChild(countdownDisplay);
+            gameArea.removeChild(itemList);
+            callback();
+        }
+    }, 1000);
+}
 
 function startGame() {
     gameInterval = setInterval(() => {
@@ -53,7 +87,7 @@ function showRandomItem() {
         if (gameArea.contains(itemElement)) {
             gameArea.removeChild(itemElement);
         }
-    }, Math.random() * 300 + 500); // 0.5 ~ 0.8 초 사이 랜덤
+    }, Math.random() * 400 + 300); // 0.3 ~ 0.7 초 사이 랜덤
 }
 
 function updateMaxClickedItem(itemName) {
@@ -73,7 +107,7 @@ function endGame() {
     const popupContent = `
         <div>게임 오버!</div>
         <div>멍멍이가 획득한 상품은?</div>
-	<div>${maxClickedItem.name} (${maxClickedItem.count}회)</div>
+        <div>${maxClickedItem.name} (${maxClickedItem.count}회)</div>
         <button onclick="restartGame()">Retry</button>
     `;
     popup.innerHTML = popupContent;
@@ -88,7 +122,7 @@ function restartGame() {
     scoreDisplay.textContent = score;
     timeDisplay.textContent = time;
     gameArea.innerHTML = ''; // 게임 영역 초기화
-    startGame();
+    startCountdown(startGame); // 카운트다운 후 게임 시작
 }
 
-startGame();
+startCountdown(startGame); // 페이지 로드 시 카운트다운 시작
