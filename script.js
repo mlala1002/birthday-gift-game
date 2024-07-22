@@ -87,7 +87,7 @@ function showRandomItem() {
         if (gameArea.contains(itemElement)) {
             gameArea.removeChild(itemElement);
         }
-    }, Math.random() * 400 + 300); // 0.3 ~ 0.7 초 사이 랜덤
+    }, Math.random() * 300 + 500); // 0.5 ~ 0.8 초 사이 랜덤
 }
 
 function updateMaxClickedItem(itemName) {
