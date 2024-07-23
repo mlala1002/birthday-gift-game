@@ -1,9 +1,9 @@
 const items = [
     { name: "입술 박치기", icon: "💋" },
-    { name: "행운의 편지", icon: "✉️" },
+    { name: "구애의 막춤", icon: "💃" },
     { name: "필살 베어허그", icon: "🤗" },
     { name: "사랑의 목줄", icon: "❤️" },
-    { name: "이빨 피아노", icon: "🦷" }
+    { name: "바디 프렌드", icon: "💆" }
 ];
 
 let score = 0;
