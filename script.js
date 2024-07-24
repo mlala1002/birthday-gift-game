@@ -9,7 +9,7 @@ const items = [
 let score = 0;
 let time = 30;
 let gameInterval;
-let maxClickedItem = { name: "", count: 0 }; // 가장 많이 클릭된 상품 정보
+let maxClickedItem = { name: "", count: 0 }; // 가장 많이 클릭된 선물 정보
 
 const gameArea = document.getElementById("game-area");
 const scoreDisplay = document.getElementById("score");
@@ -78,7 +78,7 @@ function showRandomItem() {
         score++;
         scoreDisplay.textContent = score;
         gameArea.removeChild(itemElement);
-        updateMaxClickedItem(item.name); // 클릭된 상품 갱신
+        updateMaxClickedItem(item.name); // 클릭된 선물 갱신
     });
 
     gameArea.appendChild(itemElement);
@@ -106,7 +106,7 @@ function endGame() {
     popup.classList.add("popup");
     const popupContent = `
         <div>게임 오버!</div>
-        <div>멍멍이가 획득한 상품은?</div>
+        <div>멍멍이가 획득한 선물은?</div>
         <div>${maxClickedItem.name} (${maxClickedItem.count}회)</div>
         <button onclick="restartGame()">Retry</button>
     `;
@@ -122,6 +122,11 @@ function restartGame() {
     scoreDisplay.textContent = score;
     timeDisplay.textContent = time;
     gameArea.innerHTML = ''; // 게임 영역 초기화
+
+    // countdownDisplay와 팝업 다시 추가
+    countdownDisplay.classList.add("countdown");
+    gameArea.appendChild(countdownDisplay);
+
     startCountdown(startGame); // 카운트다운 후 게임 시작
 }
 
