@@ -1,15 +1,16 @@
 const items = [
-    { name: "입술 박치기", icon: "💋" },
-    { name: "구애의 막춤", icon: "💃" },
-    { name: "필살 베어허그", icon: "🤗" },
-    { name: "사랑의 목줄", icon: "❤️" },
-    { name: "바디 프렌드", icon: "💆" }
+    { name: "입술 박치기", icon: "💋", count: 0 },
+    { name: "구애의 막춤", icon: "💃", count: 0 },
+    { name: "필살 베어허그", icon: "🤗", count: 0 },
+    { name: "사랑의 목줄", icon: "❤️", count: 0 },
+    { name: "바디 프렌드", icon: "💆", count: 0 }
 ];
 
 let score = 0;
 let time = 30;
 let gameInterval;
-let maxClickedItem = { name: "", count: 0 }; // 가장 많이 클릭된 선물 정보
+let itemIntervals = [];
+let maxClickedItems = []; // 가장 많이 클릭된 선물 정보 (최대 2개)
 
 const gameArea = document.getElementById("game-area");
 const scoreDisplay = document.getElementById("score");
@@ -53,18 +54,22 @@ function startGame() {
     gameInterval = setInterval(() => {
         if (time <= 0) {
             clearInterval(gameInterval);
+            clearItemIntervals();
             endGame();
             return;
         }
 
         time--;
         timeDisplay.textContent = time;
-        showRandomItem();
     }, 1000);
+
+    items.forEach(item => {
+        const interval = setInterval(() => showRandomItem(item), Math.random() * 1000 + 500); // 0.5 ~ 1.5 초 사이 랜덤
+        itemIntervals.push(interval);
+    });
 }
 
-function showRandomItem() {
-    const item = items[Math.floor(Math.random() * items.length)];
+function showRandomItem(item) {
     const itemElement = document.createElement("div");
     itemElement.classList.add("item");
     itemElement.innerHTML = `<span>${item.icon}</span><br><span>${item.name}</span><br><span>${item.icon}</span>`;
@@ -78,7 +83,7 @@ function showRandomItem() {
         score++;
         scoreDisplay.textContent = score;
         gameArea.removeChild(itemElement);
-        updateMaxClickedItem(item.name); // 클릭된 선물 갱신
+        updateMaxClickedItems(item.name); // 클릭된 선물 갱신
     });
 
     gameArea.appendChild(itemElement);
@@ -87,16 +92,17 @@ function showRandomItem() {
         if (gameArea.contains(itemElement)) {
             gameArea.removeChild(itemElement);
         }
-    }, Math.random() * 300 + 500); // 0.5 ~ 0.8 초 사이 랜덤
+    }, Math.random() * 500 + 500); // 0.5 ~ 1 초 사이 랜덤
 }
 
-function updateMaxClickedItem(itemName) {
+function updateMaxClickedItems(itemName) {
     const item = items.find(i => i.name === itemName);
     if (item) {
-        item.count = item.count ? item.count + 1 : 1;
-        if (item.count > maxClickedItem.count) {
-            maxClickedItem = { name: item.name, count: item.count };
-        }
+        item.count++;
+        maxClickedItems = items
+            .slice() // 배열 복사
+            .sort((a, b) => b.count - a.count) // 클릭 수 기준 내림차순 정렬
+            .slice(0, 2); // 상위 2개만 추출
     }
 }
 
@@ -104,10 +110,14 @@ function endGame() {
     // 게임 종료 시 팝업 생성
     const popup = document.createElement("div");
     popup.classList.add("popup");
+
+    // 가장 많이 클릭된 상위 2개 선물 정보 생성
     const popupContent = `
         <div>게임 오버!</div>
         <div>멍멍이가 획득한 선물은?</div>
-        <div>${maxClickedItem.name} (${maxClickedItem.count}회)</div>
+        ${maxClickedItems.map(item => `
+            <div>${item.name} (${item.count}회)</div>
+        `).join('')}
         <button onclick="restartGame()">Retry</button>
     `;
     popup.innerHTML = popupContent;
@@ -118,7 +128,8 @@ function restartGame() {
     // 게임 재시작
     score = 0;
     time = 30;
-    maxClickedItem = { name: "", count: 0 };
+    maxClickedItems = []; // 가장 많이 클릭된 선물 초기화
+    items.forEach(item => item.count = 0); // 각 아이템의 count 초기화
     scoreDisplay.textContent = score;
     timeDisplay.textContent = time;
     gameArea.innerHTML = ''; // 게임 영역 초기화
@@ -128,6 +139,11 @@ function restartGame() {
     gameArea.appendChild(countdownDisplay);
 
     startCountdown(startGame); // 카운트다운 후 게임 시작
+}
+
+function clearItemIntervals() {
+    itemIntervals.forEach(interval => clearInterval(interval));
+    itemIntervals = [];
 }
 
 startCountdown(startGame); // 페이지 로드 시 카운트다운 시작
